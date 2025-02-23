@@ -206,9 +206,10 @@
       .modal-content {
         width: 95%;
         height: 80vh;
+        padding: 8px;
       }
       #bookPreview {
-        height: calc(80vh - 40px);
+        height: calc(80vh - 16px);
       }
     }
   </style>
@@ -238,8 +239,10 @@
     let searchTimeout;
     let viewer;
 
+    // Load the Google Books API.
     google.books.load();
     google.books.setOnLoadCallback(function() {
+      // Initialize viewer; we'll reinitialize it on each readSample call.
       viewer = new google.books.DefaultViewer(document.getElementById('bookPreview'));
     });
 
@@ -305,13 +308,12 @@
         return;
       }
       document.getElementById('myModal').style.display = "block";
-      if (viewer) {
-        viewer.load(bookId, function() {
-          console.log("Preview loaded for book:", bookId);
-        });
-      } else {
-        console.error("Viewer not ready yet.");
-      }
+      // Clear and reinitialize the preview container to update the displayed book.
+      document.getElementById('bookPreview').innerHTML = "";
+      viewer = new google.books.DefaultViewer(document.getElementById('bookPreview'));
+      viewer.load(bookId, function() {
+        console.log("Preview loaded for book:", bookId);
+      });
     }
 
     function closeModal() {
