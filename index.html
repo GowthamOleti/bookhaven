@@ -30,22 +30,6 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    /* Make container bigger on desktop screens */
-    @media (min-width: 1024px) {
-      .container {
-        max-width: 900px;       /* Increase max width */
-        width: 80%;            /* Widen the container */
-        padding: 40px;         /* Add more padding */
-        margin: 60px auto;     /* Add vertical space above/below */
-      }
-      h1 {
-        font-size: 32px;       /* Slightly larger heading on desktop */
-      }
-      p {
-        font-size: 18px;       /* Slightly larger paragraph text */
-      }
-    }
-
     .logo {
       width: 100px;
       margin: 0 auto 10px;
@@ -150,6 +134,7 @@
       gap: 15px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: fadeIn 0.5s ease-out;
+      cursor: pointer; /* Make entire card clickable */
     }
     .book:hover {
       transform: scale(1.02);
@@ -222,9 +207,6 @@
       margin-left: 10px;
       margin-top: 5px;
     }
-    .toggle-synopsis:hover {
-      transform: rotate(180deg);
-    }
     .book.expanded .book-info {
       height: auto;
     }
@@ -239,6 +221,7 @@
       gap: 10px;
       justify-content: flex-end;
       margin-top: 10px;
+      cursor: auto; /* So the action buttons don't get the pointer from the card */
     }
     .book-actions button {
       background: black;
@@ -254,6 +237,18 @@
       background: #333;
       transform: scale(1.05);
     }
+
+    /* For mobile: stack the cover image on top, text below */
+    @media (max-width: 600px) {
+      .book-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .book img {
+        margin-bottom: 10px;
+      }
+    }
+
     /* Preview Page with fade-in */
     #previewPage {
       display: none;
@@ -290,10 +285,6 @@
     #bookPreview {
       width: 100%;
       height: calc(100% - 50px);
-    }
-    @media (max-width: 600px) {
-      #previewHeader { padding: 8px; }
-      #goBackBtn { padding: 8px 12px; }
     }
   </style>
 </head>
@@ -362,9 +353,9 @@
             const bookId = book.id;
             const hasPreview = info.previewLink ? 'yes' : 'no';
 
+            // Create book card
             const bookElement = document.createElement('div');
             bookElement.classList.add('book');
-
             bookElement.innerHTML = `
               <div class="book-header">
                 <div class="book-content">
@@ -375,29 +366,33 @@
                     <div class="book-synopsis">${description}</div>
                   </div>
                 </div>
-                <span
-                  class="material-icons toggle-synopsis"
-                  onclick="toggleSynopsis(this)"
-                  aria-label="Toggle synopsis"
-                >
-                  expand_more
-                </span>
+                <span class="material-icons toggle-synopsis" aria-label="Toggle synopsis">expand_more</span>
               </div>
               <div class="book-actions">
                 <button onclick="readSample('${bookId}', '${hasPreview}')">Read Sample</button>
                 <button onclick="downloadBook('${title}')">Download</button>
               </div>
             `;
+
+            // Make the entire card toggle, except for action buttons
+            bookElement.addEventListener('click', (event) => {
+              // If user clicked on an action button, don't toggle
+              if (event.target.closest('.book-actions')) return;
+              toggleSynopsis(bookElement);
+            });
+
             booksContainer.appendChild(bookElement);
           });
         })
         .catch(error => alert("Failed to fetch books. Please try again later."));
     }
 
-    function toggleSynopsis(element) {
-      const bookElement = element.closest('.book');
+    function toggleSynopsis(bookElement) {
       bookElement.classList.toggle('expanded');
-      element.textContent = bookElement.classList.contains('expanded') ? 'expand_less' : 'expand_more';
+      const icon = bookElement.querySelector('.toggle-synopsis');
+      if (icon) {
+        icon.textContent = bookElement.classList.contains('expanded') ? 'expand_less' : 'expand_more';
+      }
     }
 
     function readSample(bookId, hasPreview) {
