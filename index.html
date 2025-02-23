@@ -84,13 +84,13 @@
     button:hover {
       opacity: 0.85;
     }
-    /* New Genre Tags */
+    /* Updated Genre Tags: Increased gap */
     .genre-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
     .genre-tags .tag {
       background-color: #e0e0e0;
@@ -282,7 +282,8 @@
       const booksContainer = document.getElementById('books');
       booksContainer.innerHTML = '<p>Loading books...</p>';
 
-      fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=6`)
+      // Return 15 suggestions per search
+      fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=15`)
         .then(response => response.json())
         .then(data => {
           booksContainer.innerHTML = '';
@@ -354,14 +355,16 @@
       window.open(`https://annas-archive.org/search?q=${encodedTitle}`, '_blank');
     }
 
-    // When a genre tag is clicked, populate the search input and trigger search
     function searchByGenre(genre) {
       document.getElementById('search').value = genre;
       searchBooks();
     }
 
-    // Dynamic placeholder with a typewriter effect
-    const suggestions = ['Science Fiction', 'Mystery', 'Romance', 'Fantasy', 'Biography', 'History', 'Thriller'];
+    // Dynamic placeholder with typewriter effect including famous book names
+    const suggestions = [
+      'Science Fiction', 'Mystery', 'Romance', 'Fantasy', 'Biography', 
+      'History', 'Thriller', 'Steve Jobs', 'The Great Gatsby', '1984', 'Sapiens'
+    ];
     let suggestionIndex = 0;
     const searchInput = document.getElementById('search');
 
@@ -380,7 +383,6 @@
       suggestionIndex = (suggestionIndex + 1) % suggestions.length;
     }
 
-    // Initial call and update interval
     updatePlaceholder();
     setInterval(updatePlaceholder, 4000);
 
