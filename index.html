@@ -28,7 +28,24 @@
       border-radius: 12px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
       text-align: center;
+      margin-bottom: 20px;
     }
+    /* Make container bigger on desktop screens */
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 900px;       /* Increase max width */
+        width: 80%;            /* Widen the container */
+        padding: 40px;         /* Add more padding */
+        margin: 60px auto;     /* Add vertical space above/below */
+      }
+      h1 {
+        font-size: 32px;       /* Slightly larger heading on desktop */
+      }
+      p {
+        font-size: 18px;       /* Slightly larger paragraph text */
+      }
+    }
+
     .logo {
       width: 100px;
       margin: 0 auto 10px;
