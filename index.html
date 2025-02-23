@@ -183,6 +183,11 @@
       width: 80%;
       max-width: 800px;
       border-radius: 10px;
+      height: 600px;
+    }
+    #bookPreview {
+      width: 100%;
+      height: calc(100% - 40px);
     }
     .close {
       color: #aaa;
@@ -195,6 +200,16 @@
       color: black;
       text-decoration: none;
       cursor: pointer;
+    }
+    /* Responsive adjustments for mobile */
+    @media (max-width: 600px) {
+      .modal-content {
+        width: 95%;
+        height: 80vh;
+      }
+      #bookPreview {
+        height: calc(80vh - 40px);
+      }
     }
   </style>
 </head>
@@ -215,7 +230,7 @@
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
       <!-- Google Books Viewer will load here -->
-      <div id="bookPreview" style="width: 100%; height: 500px;"></div>
+      <div id="bookPreview"></div>
     </div>
   </div>
 
@@ -223,7 +238,6 @@
     let searchTimeout;
     let viewer;
 
-    // Load the Google Books API and initialize the viewer
     google.books.load();
     google.books.setOnLoadCallback(function() {
       viewer = new google.books.DefaultViewer(document.getElementById('bookPreview'));
@@ -249,9 +263,7 @@
             const author = info.authors ? info.authors.join(', ') : "Unknown Author";
             const description = info.description || "No synopsis available.";
             const thumbnail = info.imageLinks ? info.imageLinks.thumbnail : 'https://via.placeholder.com/120x160';
-            // Use the volume id from the API
             const bookId = book.id;
-            // Check if a preview link is available
             const hasPreview = info.previewLink ? 'yes' : 'no';
 
             const bookElement = document.createElement('div');
