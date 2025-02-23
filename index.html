@@ -12,8 +12,9 @@
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "qech8xb964");
-</script>
+  </script>
   <style>
+    /* Existing styles */
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       margin: 0;
@@ -23,7 +24,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; /* Center vertically */
+      justify-content: center;
       min-height: 100vh;
     }
     .container {
@@ -34,7 +35,6 @@
       border-radius: 12px;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
       text-align: center;
-      /* Removed margin-top so content is vertically centered */
     }
     .logo {
       width: 100px;
@@ -60,7 +60,7 @@
       border-radius: 10px;
       padding: 5px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     input {
       flex: 1;
@@ -83,6 +83,26 @@
     }
     button:hover {
       opacity: 0.85;
+    }
+    /* New Genre Tags */
+    .genre-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .genre-tags .tag {
+      background-color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .genre-tags .tag:hover {
+      background-color: #ccc;
     }
     .books {
       margin-top: 20px;
@@ -208,7 +228,6 @@
       width: 100%;
       height: calc(100% - 50px);
     }
-    /* Responsive adjustments for mobile */
     @media (max-width: 600px) {
       #previewHeader {
         padding: 8px;
@@ -225,8 +244,16 @@
     <h1>Find Your Read</h1>
     <p>Find top-rated books curated just for you. Get recommendations based on your interests.</p>
     <div class="search-container">
-      <input type="text" id="search" placeholder="Enter a topic or genre..." aria-label="Search for books" />
+      <input type="text" id="search" placeholder="Search books..." aria-label="Search for books" />
       <button onclick="searchBooks()" aria-label="Find books">Find</button>
+    </div>
+    <!-- Genre Tags Section -->
+    <div class="genre-tags">
+      <span class="tag" onclick="searchByGenre('Science Fiction')">Science Fiction</span>
+      <span class="tag" onclick="searchByGenre('Mystery')">Mystery</span>
+      <span class="tag" onclick="searchByGenre('Romance')">Romance</span>
+      <span class="tag" onclick="searchByGenre('Fantasy')">Fantasy</span>
+      <span class="tag" onclick="searchByGenre('Biography')">Biography</span>
     </div>
     <div class="books" id="books"></div>
   </div>
@@ -310,9 +337,7 @@
         alert("No preview available for this book.");
         return;
       }
-      // Show full page preview.
       document.getElementById('previewPage').style.display = "block";
-      // Clear and reinitialize the preview container.
       document.getElementById('bookPreview').innerHTML = "";
       viewer = new google.books.DefaultViewer(document.getElementById('bookPreview'));
       viewer.load(bookId, function() {
@@ -328,6 +353,36 @@
       const encodedTitle = encodeURIComponent(title);
       window.open(`https://annas-archive.org/search?q=${encodedTitle}`, '_blank');
     }
+
+    // When a genre tag is clicked, populate the search input and trigger search
+    function searchByGenre(genre) {
+      document.getElementById('search').value = genre;
+      searchBooks();
+    }
+
+    // Dynamic placeholder with a typewriter effect
+    const suggestions = ['Science Fiction', 'Mystery', 'Romance', 'Fantasy', 'Biography', 'History', 'Thriller'];
+    let suggestionIndex = 0;
+    const searchInput = document.getElementById('search');
+
+    function typeEffect(text, element, delay = 100) {
+      let index = 0;
+      element.setAttribute('placeholder', '');
+      const interval = setInterval(() => {
+        element.setAttribute('placeholder', text.substring(0, index));
+        index++;
+        if (index > text.length) clearInterval(interval);
+      }, delay);
+    }
+
+    function updatePlaceholder() {
+      typeEffect(suggestions[suggestionIndex], searchInput, 100);
+      suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+    }
+
+    // Initial call and update interval
+    updatePlaceholder();
+    setInterval(updatePlaceholder, 4000);
 
     document.getElementById('search').addEventListener('input', () => {
       clearTimeout(searchTimeout);
