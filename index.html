@@ -6,7 +6,7 @@
   <title>Find Your Read</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <script src="https://www.google.com/books/jsapi.js"></script>
-<script type="text/javascript">
+  <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -141,7 +141,7 @@
       gap: 15px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       animation: fadeIn 0.5s ease-out;
-      cursor: pointer; /* Make entire card clickable */
+      cursor: pointer;
     }
     .book:hover {
       transform: scale(1.02);
@@ -173,7 +173,7 @@
     .book:hover img {
       transform: perspective(600px) rotateY(15deg);
     }
-    /* .book-info is the same height as the book cover, with a gradient fade. */
+    /* .book-info holds title, author, and synopsis (collapsed) */
     .book-info {
       position: relative;
       height: 160px;
@@ -228,7 +228,7 @@
       gap: 10px;
       justify-content: flex-end;
       margin-top: 10px;
-      cursor: auto; /* So the action buttons don't get the pointer from the card */
+      cursor: auto;
     }
     .book-actions button {
       background: black;
@@ -244,8 +244,7 @@
       background: #333;
       transform: scale(1.05);
     }
-
-    /* For mobile: stack the cover image on top, text below */
+    /* Mobile: Stack content vertically (cover on top) */
     @media (max-width: 600px) {
       .book-content {
         flex-direction: column;
@@ -255,7 +254,6 @@
         margin-bottom: 10px;
       }
     }
-
     /* Preview Page with fade-in */
     #previewPage {
       display: none;
@@ -297,20 +295,11 @@
 </head>
 <body>
   <div class="container" id="mainContainer">
-    <img
-      src="https://static.wixstatic.com/media/5c0589_a7429b8d9efc4eacb7b3224df55036de~mv2.png"
-      alt="Logo"
-      class="logo"
-    />
+    <img src="https://static.wixstatic.com/media/5c0589_a7429b8d9efc4eacb7b3224df55036de~mv2.png" alt="Logo" class="logo" />
     <h1>Find Your Read</h1>
     <p>Find top-rated books curated just for you. Get recommendations based on your interests.</p>
     <div class="search-container">
-      <input
-        type="text"
-        id="search"
-        placeholder="Search books..."
-        aria-label="Search for books"
-      />
+      <input type="text" id="search" placeholder="Search books..." aria-label="Search for books" />
       <button onclick="searchBooks()" aria-label="Find books">Find</button>
     </div>
     <div class="genre-tags">
@@ -376,14 +365,14 @@
                 <span class="material-icons toggle-synopsis" aria-label="Toggle synopsis">expand_more</span>
               </div>
               <div class="book-actions">
-                <button onclick="readSample('${bookId}', '${hasPreview}')">Read Sample</button>
-                <button onclick="downloadBook('${title}')">Download</button>
+                <button onclick="buyNow('${title}')" aria-label="Buy Now">Buy Now</button>
+                <button onclick="readSample('${bookId}', '${hasPreview}')" aria-label="Read Sample">Read Sample</button>
+                <button onclick="downloadBook('${title}')" aria-label="Download">Download</button>
               </div>
             `;
 
-            // Make the entire card toggle, except for action buttons
+            // Make the entire card toggle (except action buttons)
             bookElement.addEventListener('click', (event) => {
-              // If user clicked on an action button, don't toggle
               if (event.target.closest('.book-actions')) return;
               toggleSynopsis(bookElement);
             });
@@ -400,6 +389,11 @@
       if (icon) {
         icon.textContent = bookElement.classList.contains('expanded') ? 'expand_less' : 'expand_more';
       }
+    }
+
+    function buyNow(title) {
+      const url = "https://www.amazon.com/s?k=" + encodeURIComponent(title);
+      window.open(url, '_blank');
     }
 
     function readSample(bookId, hasPreview) {
@@ -452,13 +446,11 @@
     updatePlaceholder();
     setInterval(updatePlaceholder, 4000);
 
-    // Debounced search on input
     document.getElementById('search').addEventListener('input', () => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(searchBooks, 500);
     });
 
-    // Close preview if user clicks outside it
     window.onclick = function(event) {
       if (event.target === document.getElementById('previewPage')) goBack();
     }
