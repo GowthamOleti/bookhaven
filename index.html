@@ -15,32 +15,43 @@
     })(window, document, "clarity", "script", "qee8k3r4r4");
   </script>
   <style>
-    /* Full white background */
+    /* Make the entire page a vertical flex container */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       margin: 0;
       padding: 0;
       background-color: #FFF;
       color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+      /* Let the body fill at least 100vh, 
+         and arrange child elements in a column */
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
     }
 
-    /* Container without box-like background */
+    /* Main content wrapper (flex:1) so it expands to fill 
+       available vertical space. Then center its contents. */
+    .main-content {
+      flex: 1; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* center vertically */
+      align-items: center;     /* center horizontally */
+    }
+
+    /* The container no longer needs a large margin-bottom
+       because we are centering it inside .main-content */
     .container {
       max-width: 750px;
       width: 90%;
-      padding: 25px;
       text-align: center;
-      margin-bottom: 20px;
+      padding: 25px;
     }
 
     .logo {
       width: 100px;
-      margin: 0 auto 10px;
+      margin: 0 auto 4px; /* smaller gap below the logo */
       display: block;
     }
 
@@ -70,6 +81,7 @@
     .search-container:focus-within {
       box-shadow: 0 2px 15px rgba(0,0,0,0.2);
     }
+
     input {
       flex: 1;
       padding: 12px;
@@ -101,19 +113,12 @@
       vertical-align: middle;
     }
 
-    /* Loader (general) */
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid black;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    /* Style for disabled buttons (no sample) */
+    button[disabled] {
+      background-color: #ccc;
+      cursor: not-allowed;
+      color: #555;
+      opacity: 0.7;
     }
 
     .genre-tags {
@@ -135,6 +140,15 @@
     .genre-tags .tag:hover {
       background-color: #ccc;
       transform: scale(1.05);
+    }
+
+    /* Quote of the Day below the tags */
+    .quote-of-the-day {
+      font-size: 14px;
+      font-style: italic;
+      color: #777;
+      margin-bottom: 20px;
+      min-height: 20px;
     }
 
     .books {
@@ -186,13 +200,17 @@
       transform: perspective(600px) rotateY(15deg);
     }
 
-    /* Smooth expand/collapse */
+    /* Smooth expand/collapse for the synopsis */
     .book-info {
-      max-height: 160px;    /* default "collapsed" height */
-      overflow: hidden;     /* hide the overflow while collapsed */
+      max-height: 160px; /* collapsed height */
+      overflow: hidden;
       text-align: left;
-      transition: max-height 0.5s ease; /* smooth expand/collapse */
+      transition: max-height 0.5s ease;
     }
+    .book.expanded .book-info {
+      max-height: 9999px;
+    }
+
     .book-title {
       font-weight: bold;
       font-size: 18px;
@@ -209,19 +227,14 @@
       margin-top: 8px;
     }
 
-    /* Expanded synopsis */
-    .book.expanded .book-info {
-      max-height: 9999px;
-    }
-
     .toggle-synopsis {
       font-size: 24px;
       cursor: pointer;
       user-select: none;
       color: black;
       margin-left: 10px;
-      transition: transform 0.3s ease;
       margin-top: 5px;
+      transition: transform 0.3s ease;
     }
 
     .book-actions {
@@ -255,7 +268,6 @@
       .book img {
         margin-bottom: 10px;
       }
-      /* Keep the three action buttons in one row */
       .book-actions {
         flex-direction: row;
         flex-wrap: nowrap;
@@ -308,37 +320,71 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+    /* Loader (general) */
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid black;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer pinned at bottom since .main-content can grow */
+    footer {
+      padding: 10px 0;
+      text-align: center;
+      width: 100%;
+      background-color: #f8f8f8;
+      color: #666;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="mainContainer">
-    <img src="https://static.wixstatic.com/media/5c0589_a7429b8d9efc4eacb7b3224df55036de~mv2.png" alt="Logo" class="logo" />
-    <h1>Find Your Read</h1>
-    <p>Find top-rated books curated just for you. Get recommendations based on your interests.</p>
+  <!-- Main wrapper that flexes to fill vertical space, 
+       so .container can be centered -->
+  <div class="main-content">
+    <div class="container" id="mainContainer">
+      <img src="https://static.wixstatic.com/media/5c0589_a7429b8d9efc4eacb7b3224df55036de~mv2.png" alt="Logo" class="logo" />
+      <h1>Find Your Read</h1>
+      <p>Find top-rated books curated just for you. Get recommendations based on your interests.</p>
 
-    <div class="search-container">
-      <input type="text" id="search" placeholder="Search books..." aria-label="Search for books" />
-      <button onclick="searchBooks()" aria-label="Find books">Find</button>
+      <div class="search-container">
+        <input type="text" id="search" placeholder="Search books..." aria-label="Search for books" />
+        <button onclick="searchBooks()" aria-label="Find books">Find</button>
+      </div>
+
+      <div class="genre-tags">
+        <span class="tag" onclick="searchByGenre('Science Fiction')">Science Fiction</span>
+        <span class="tag" onclick="searchByGenre('Mystery')">Mystery</span>
+        <span class="tag" onclick="searchByGenre('Romance')">Romance</span>
+        <span class="tag" onclick="searchByGenre('Fantasy')">Fantasy</span>
+        <span class="tag" onclick="searchByGenre('Biography')">Biography</span>
+      </div>
+
+      <div class="quote-of-the-day" id="quoteOfTheDay"></div>
+
+      <div class="books" id="books"></div>
     </div>
-
-    <div class="genre-tags">
-      <span class="tag" onclick="searchByGenre('Science Fiction')">Science Fiction</span>
-      <span class="tag" onclick="searchByGenre('Mystery')">Mystery</span>
-      <span class="tag" onclick="searchByGenre('Romance')">Romance</span>
-      <span class="tag" onclick="searchByGenre('Fantasy')">Fantasy</span>
-      <span class="tag" onclick="searchByGenre('Biography')">Biography</span>
-    </div>
-
-    <div class="books" id="books"></div>
   </div>
 
+  <!-- Preview Page -->
   <div id="previewPage">
     <div id="previewHeader">
       <button id="goBackBtn" onclick="goBack()">Go Back</button>
     </div>
-    <!-- Book Preview will be loaded into this container -->
     <div id="bookPreview"></div>
   </div>
+
+  <!-- Footer at bottom -->
+  <footer>Built by Gow</footer>
 
   <script>
     let searchTimeout, viewer;
@@ -346,6 +392,27 @@
     google.books.setOnLoadCallback(function() {
       viewer = new google.books.DefaultViewer(document.getElementById('bookPreview'));
     });
+
+    // 10 quotes
+    const quotes = [
+      "“A room without books is like a body without a soul.” – Cicero",
+      "“There is no friend as loyal as a book.” – Ernest Hemingway",
+      "“Good friends, good books, and a sleepy conscience: this is the ideal life.” – Mark Twain",
+      "“Books are a uniquely portable magic.” – Stephen King",
+      "“Never trust anyone who has not brought a book with them.” – Lemony Snicket",
+      "“You can never get a cup of tea large enough or a book long enough to suit me.” – C.S. Lewis",
+      "“The only thing you absolutely have to know is the location of the library.” – Albert Einstein",
+      "“That's the thing about books. They let you travel without moving your feet.” – Jhumpa Lahiri",
+      "“There is more treasure in books than in all the pirate’s loot on Treasure Island.” – Walt Disney",
+      "“I do believe something very magical can happen when you read a book.” – J.K. Rowling"
+    ];
+
+    function setQuoteOfTheDay() {
+      const quoteElement = document.getElementById('quoteOfTheDay');
+      const dayOfMonth = new Date().getDate();
+      const index = dayOfMonth % quotes.length;
+      quoteElement.textContent = quotes[index];
+    }
 
     function searchBooks() {
       const query = document.getElementById('search').value.trim();
@@ -372,6 +439,9 @@
             const bookId = book.id;
             const hasPreview = info.previewLink ? 'yes' : 'no';
 
+            const readButtonLabel = hasPreview === 'yes' ? 'Read Sample' : 'No Sample';
+            const disabledAttribute = hasPreview === 'no' ? 'disabled' : '';
+
             const bookElement = document.createElement('div');
             bookElement.classList.add('book');
             bookElement.innerHTML = `
@@ -390,8 +460,8 @@
                 <button onclick="buyNow('${title}')" aria-label="Buy Now">
                   <span class="material-icons">shopping_cart</span>Buy Now
                 </button>
-                <button onclick="readSample('${bookId}', '${hasPreview}')" aria-label="Read Sample">
-                  <span class="material-icons">menu_book</span>Read Sample
+                <button onclick="readSample('${bookId}', '${hasPreview}')" aria-label="${readButtonLabel}" ${disabledAttribute}>
+                  <span class="material-icons">menu_book</span>${readButtonLabel}
                 </button>
                 <button onclick="downloadBook('${title}')" aria-label="Download">
                   <span class="material-icons">file_download</span>Download
@@ -399,8 +469,7 @@
               </div>
             `;
 
-            // Toggle synopsis on clicking the header or arrow,
-            // but NOT when clicking inside .book-actions
+            // Toggle synopsis by clicking the header or arrow 
             const header = bookElement.querySelector('.book-header');
             header.addEventListener('click', (event) => {
               if (event.target.closest('.book-actions')) return;
@@ -416,23 +485,15 @@
     function toggleSynopsis(bookElement) {
       bookElement.classList.toggle('expanded');
       const icon = bookElement.querySelector('.toggle-synopsis');
-      if (bookElement.classList.contains('expanded')) {
-        icon.textContent = 'expand_less'; // up arrow
-      } else {
-        icon.textContent = 'expand_more'; // down arrow
-      }
+      icon.textContent = bookElement.classList.contains('expanded') ? 'expand_less' : 'expand_more';
     }
 
     function buyNow(title) {
-      // Open Amazon with the given title
-      const url = "https://www.amazon.com/s?k=" + encodeURIComponent(title);
-      window.open(url, '_blank');
+      window.open("https://www.amazon.com/s?k=" + encodeURIComponent(title), '_blank');
     }
 
     function downloadBook(title) {
-      // Open Anna's Archive for the given title
-      const url = "https://annas-archive.org/search?q=" + encodeURIComponent(title);
-      window.open(url, '_blank');
+      window.open("https://annas-archive.org/search?q=" + encodeURIComponent(title), '_blank');
     }
 
     function readSample(bookId, hasPreview) {
@@ -440,21 +501,13 @@
         alert("No preview available for this book.");
         return;
       }
+      document.getElementById('previewPage').style.display = "block";
 
-      // Show the preview page
-      const previewPage = document.getElementById('previewPage');
-      previewPage.style.display = "block";
-
-      // Show a loader while the sample loads
       const previewContainer = document.getElementById('bookPreview');
-      previewContainer.innerHTML = `
-        <div id="sampleLoader" class="loader"></div>
-      `;
+      previewContainer.innerHTML = `<div id="sampleLoader" class="loader"></div>`;
 
-      // Load the preview
       viewer = new google.books.DefaultViewer(previewContainer);
       viewer.load(bookId, () => {
-        // Once loaded, remove the loader
         const loader = document.getElementById('sampleLoader');
         if (loader) loader.remove();
       });
@@ -469,7 +522,7 @@
       searchBooks();
     }
 
-    // Dynamic placeholder suggestions
+    // Dynamic placeholder text
     const suggestions = [
       'Science Fiction', 'Mystery', 'Romance', 'Fantasy', 'Biography',
       'History', 'Thriller', 'Steve Jobs', 'The Great Gatsby', '1984', 'Sapiens'
@@ -492,8 +545,12 @@
       suggestionIndex = (suggestionIndex + 1) % suggestions.length;
     }
 
-    updatePlaceholder();
-    setInterval(updatePlaceholder, 4000);
+    // On load
+    window.addEventListener('DOMContentLoaded', () => {
+      setQuoteOfTheDay();
+      updatePlaceholder();
+      setInterval(updatePlaceholder, 4000);
+    });
 
     // Delayed search on typing
     searchInput.addEventListener('input', () => {
@@ -506,7 +563,7 @@
       if (event.target === document.getElementById('previewPage')) {
         goBack();
       }
-    }
+    };
   </script>
 </body>
 </html>
