@@ -23,15 +23,13 @@
       color: #333;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-      /* Let the body fill at least 100vh, 
-         and arrange child elements in a column */
+      /* Fill screen & arrange child elements in a column */
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
-    /* Main content wrapper (flex:1) so it expands to fill 
-       available vertical space. Then center its contents. */
+    /* Main content wrapper centers everything */
     .main-content {
       flex: 1; 
       display: flex;
@@ -40,8 +38,6 @@
       align-items: center;     /* center horizontally */
     }
 
-    /* The container no longer needs a large margin-bottom
-       because we are centering it inside .main-content */
     .container {
       max-width: 750px;
       width: 90%;
@@ -51,7 +47,7 @@
 
     .logo {
       width: 100px;
-      margin: 0 auto 4px; /* smaller gap below the logo */
+      margin: 0 auto 4px;
       display: block;
     }
 
@@ -81,7 +77,6 @@
     .search-container:focus-within {
       box-shadow: 0 2px 15px rgba(0,0,0,0.2);
     }
-
     input {
       flex: 1;
       padding: 12px;
@@ -142,7 +137,7 @@
       transform: scale(1.05);
     }
 
-    /* Quote of the Day below the tags */
+    /* Quote below the tags */
     .quote-of-the-day {
       font-size: 14px;
       font-style: italic;
@@ -200,9 +195,9 @@
       transform: perspective(600px) rotateY(15deg);
     }
 
-    /* Smooth expand/collapse for the synopsis */
+    /* Smooth expand/collapse */
     .book-info {
-      max-height: 160px; /* collapsed height */
+      max-height: 160px;
       overflow: hidden;
       text-align: left;
       transition: max-height 0.5s ease;
@@ -210,7 +205,6 @@
     .book.expanded .book-info {
       max-height: 9999px;
     }
-
     .book-title {
       font-weight: bold;
       font-size: 18px;
@@ -313,6 +307,7 @@
       overflow: auto;
       position: relative;
     }
+
     /* Loader for the read sample preview */
     #sampleLoader {
       position: absolute;
@@ -348,8 +343,6 @@
   </style>
 </head>
 <body>
-  <!-- Main wrapper that flexes to fill vertical space, 
-       so .container can be centered -->
   <div class="main-content">
     <div class="container" id="mainContainer">
       <img src="https://static.wixstatic.com/media/5c0589_a7429b8d9efc4eacb7b3224df55036de~mv2.png" alt="Logo" class="logo" />
@@ -407,11 +400,11 @@
       "“I do believe something very magical can happen when you read a book.” – J.K. Rowling"
     ];
 
+    // Picks a random quote from the list on page load
     function setQuoteOfTheDay() {
       const quoteElement = document.getElementById('quoteOfTheDay');
-      const dayOfMonth = new Date().getDate();
-      const index = dayOfMonth % quotes.length;
-      quoteElement.textContent = quotes[index];
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      quoteElement.textContent = quotes[randomIndex];
     }
 
     function searchBooks() {
@@ -469,7 +462,7 @@
               </div>
             `;
 
-            // Toggle synopsis by clicking the header or arrow 
+            // Toggle synopsis on clicking the header or arrow
             const header = bookElement.querySelector('.book-header');
             header.addEventListener('click', (event) => {
               if (event.target.closest('.book-actions')) return;
@@ -547,7 +540,9 @@
 
     // On load
     window.addEventListener('DOMContentLoaded', () => {
+      // Set random quote
       setQuoteOfTheDay();
+      // Animate placeholder
       updatePlaceholder();
       setInterval(updatePlaceholder, 4000);
     });
